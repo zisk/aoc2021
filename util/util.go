@@ -30,3 +30,21 @@ func InputToInts() ([]int, error) {
 	return result, nil
 
 }
+
+func InputToTxt() ([]string, error) {
+	var result []string
+
+	file, err := os.Open("./in.txt")
+	if err != nil {
+		return result, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		result = append(result, scanner.Text())
+	}
+
+	return result, nil
+}
