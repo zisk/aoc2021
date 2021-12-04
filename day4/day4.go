@@ -76,11 +76,9 @@ func (c *card) score(lastdraw int) int {
 }
 
 func makeCard(rawcard string) card {
-	rowSplitReg := regexp.MustCompile(`\s+`)
 	numGrid := make(map[int][5]int)
-	rows := strings.Split(rawcard, "\n")
-	for i, row := range rows {
-		rowSplit := rowSplitReg.Split(strings.Trim(row, " "), -1)
+	for i, row := range strings.Split(rawcard, "\n") {
+		rowSplit := strings.Fields(row)
 		var rowInts [5]int
 		for p, n := range rowSplit {
 			r, _ := strconv.Atoi(n)
