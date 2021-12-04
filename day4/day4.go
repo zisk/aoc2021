@@ -25,12 +25,11 @@ type card struct {
 }
 
 func (c *card) check(draw int) {
-search:
 	for ro := 0; ro < 5; ro++ {
 		for col := 0; col < 5; col++ {
 			if c.nums[ro][col] == draw {
 				c.hits[ro][col] = true
-				break search
+				return
 			}
 		}
 	}
