@@ -110,14 +110,13 @@ func main() {
 		cards = append(cards, makeCard(c))
 	}
 
-drawloop:
 	for _, draw := range draws {
-		for _, bingoCard := range cards {
-			bingoCard.check(draw)
-			if bingoCard.winner() {
-				winnerScore := bingoCard.score(draw)
-				fmt.Printf("Winner found!\nScore: %d\n", winnerScore)
-				break drawloop
+		for cs := 0; cs < len(cards); cs++ {
+			cards[cs].check(draw)
+			if cards[cs].winner() {
+				winnerScore := cards[cs].score(draw)
+				fmt.Printf("Winner found!\nScore: %d\n\n", winnerScore)
+				cards = append(cards[:cs], cards[cs+1:]...)
 			}
 		}
 	}

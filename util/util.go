@@ -2,6 +2,7 @@ package util
 
 import (
 	"bufio"
+	"io/ioutil"
 	"os"
 	"strconv"
 )
@@ -47,4 +48,13 @@ func InputToTxt() ([]string, error) {
 	}
 
 	return result, nil
+}
+
+func InputRaw() (string, error) {
+	file, err := ioutil.ReadFile("./in.txt")
+	if err != nil {
+		return "", err
+	}
+
+	return string(file), nil
 }
