@@ -58,3 +58,17 @@ func InputRaw() (string, error) {
 
 	return string(file), nil
 }
+
+func Max(a int, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func Min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
