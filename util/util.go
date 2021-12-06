@@ -59,6 +59,15 @@ func InputRaw() (string, error) {
 	return string(file), nil
 }
 
+func StrsToInts(strs []string) []int {
+	var result []int
+	for _, s := range strs {
+		c, _ := strconv.Atoi(s)
+		result = append(result, c)
+	}
+	return result
+}
+
 func Max(a int, b int) int {
 	if a > b {
 		return a
