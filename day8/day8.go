@@ -41,7 +41,6 @@ func (d *display) countEasyNums() int {
 func (d *display) decode() int {
 	keyMap := make(map[string]string)
 	numMap := make(map[int]string)
-	rosetta := make(map[string]string)
 	holding := make([]string, len(d.pattern))
 	copy(holding, d.pattern)
 
@@ -68,28 +67,21 @@ func (d *display) decode() int {
 		}
 	}
 
-	ninestr, holding := findNine(holding, numMap[1])
+	ninestr, holding := findNine(holding, numMap[4])
 	keyMap[SortString(ninestr)] = "9"
 	numMap[9] = ninestr
 
-	rosetta["a"] = findA(numMap[7], numMap[1])
-	rosetta["e"] = findE(numMap[8], numMap[9])
-
-	twostr, holding := findTwo(holding, rosetta["e"])
-	keyMap[SortString(twostr)] = "2"
-	numMap[2] = twostr
-
-	rosetta["g"] = findG(numMap[4], numMap[9], rosetta["a"])
-	rosetta["b"] = findB(numMap[8], numMap[2], numMap[1])
-
-	threeStr, fiveStr, holding := findThreeFive(rosetta["b"], holding)
+	threeStr, holding := findThree(holding, numMap[7])
 	keyMap[SortString(threeStr)] = "3"
 	numMap[3] = threeStr
+
+	twostr, fiveStr, holding := findTwoFive(holding, numMap[4])
+	keyMap[SortString(twostr)] = "2"
+	numMap[2] = twostr
 	keyMap[SortString(fiveStr)] = "5"
 	numMap[5] = fiveStr
 
-	rosetta["c"] = findC(numMap[8], numMap[5], rosetta["e"])
-	sixStr, zeroStr := findSixZero(rosetta["c"], holding)
+	sixStr, zeroStr := findSixZero(holding, numMap[7])
 	keyMap[SortString(sixStr)] = "6"
 	numMap[6] = sixStr
 	keyMap[SortString(zeroStr)] = "0"
@@ -106,93 +98,79 @@ func (d *display) decode() int {
 
 }
 
-func findNine(nlist []string, one string) (string, []string) {
-	for i, n := range nlist {
-		if len(n) == 6 {
-			if strings.Contains(n, string(one[0])) && strings.Contains(n, string(one[1])) {
-				nlist := append(nlist[:i], nlist[i+1:]...)
-				return n, nlist
+func findNine(hold []string, four string) (string, []string) {
+	for i := len(hold) - 1; i >= 0; i-- {
+		if len(hold[i]) == 6 {
+			if checkContains(hold[i], four) {
+				nine := hold[i]
+				hold = append(hold[:i], hold[i+1:]...)
+				return nine, hold
 			}
 		}
 	}
 	return "", nil
 }
 
-func findTwo(nlist []string, ePos string) (string, []string) {
-	for i, n := range nlist {
-		if len(n) == 5 && strings.Contains(n, ePos) {
-			nlist := append(nlist[:i], nlist[i+1:]...)
-			return n, nlist
+func findThree(hold []string, seven string) (string, []string) {
+	for i := len(hold) - 1; i >= 0; i-- {
+		if len(hold[i]) == 5 {
+			if checkContains(hold[i], seven) {
+				three := hold[i]
+				hold = append(hold[:i], hold[i+1:]...)
+				return three, hold
+			}
 		}
 	}
 	return "", nil
 }
 
-func findA(seven string, one string) string {
-	s := strings.Replace(seven, string(one[0]), "", -1)
-	s = strings.Replace(s, string(one[1]), "", -1)
-	return s
-}
-
-func findE(eight string, nine string) string {
-	for i := range nine {
-		eight = strings.Replace(eight, string(nine[i]), "", -1)
-	}
-	return eight
-}
-
-func findG(four string, nine string, aPos string) string {
-	n := strings.Replace(nine, aPos, "", -1)
-	for i := range four {
-		n = strings.Replace(n, string(four[i]), "", -1)
-	}
-	return n
-}
-
-func findB(eight string, two string, one string) string {
-	for i := range two {
-		eight = strings.Replace(eight, string(two[i]), "", -1)
-	}
-	for i := range one {
-		eight = strings.Replace(eight, string(one[i]), "", -1)
-	}
-	return eight
-}
-
-func findC(eight string, five string, posE string) string {
-	eight = strings.Replace(eight, posE, "", -1)
-	for i := range five {
-		eight = strings.Replace(eight, string(five[i]), "", -1)
-	}
-	return eight
-}
-
-func findThreeFive(posB string, hold []string) (string, string, []string) {
-	var three, five string
+func findTwoFive(hold []string, four string) (string, string, []string) {
+	var five, two string
 	for i := len(hold) - 1; i >= 0; i-- {
 		if len(hold[i]) == 5 {
-			if strings.Contains(hold[i], posB) {
+			intersectCount := 0
+			for _, l := range four {
+				s := string(l)
+				if strings.Contains(hold[i], s) {
+					intersectCount++
+				}
+			}
+			if intersectCount == 3 {
 				five = hold[i]
 				hold = append(hold[:i], hold[i+1:]...)
 			} else {
-				three = hold[i]
+				two = hold[i]
 				hold = append(hold[:i], hold[i+1:]...)
 			}
 		}
 	}
-	return three, five, hold
+	return two, five, hold
 }
 
-func findSixZero(posC string, hold []string) (string, string) {
+func findSixZero(hold []string, seven string) (string, string) {
 	var six, zero string
-	for i := range hold {
-		if strings.Contains(hold[i], posC) {
-			six = hold[i]
-		} else {
-			zero = hold[i]
+	for i := len(hold) - 1; i >= 0; i-- {
+		if len(hold[i]) == 6 {
+			if checkContains(hold[i], seven) {
+				zero = hold[i]
+				hold = append(hold[:i], hold[i+1:]...)
+			} else {
+				six = hold[i]
+				hold = append(hold[:i], hold[i+1:]...)
+			}
 		}
 	}
+
 	return six, zero
+}
+
+func checkContains(a string, b string) bool {
+	for _, i := range b {
+		if !(strings.Contains(a, string(i))) {
+			return false
+		}
+	}
+	return true
 }
 
 func makeDisplay(in string) display {
